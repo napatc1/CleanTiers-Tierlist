@@ -16,9 +16,34 @@ header {
 }
 
 header h1 {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 1.6rem;
   color: #ffffff;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.discord-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #5865f2;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.discord-btn:hover {
+  background: #4752c4;
 }
 
 nav {
