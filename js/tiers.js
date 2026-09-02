@@ -1,10 +1,10 @@
 // Tier -> point value. Higher tier = more points.
 const TIER_POINTS = {
-  HT1: 10, LT1: 9,
-  HT2: 8,  LT2: 7,
-  HT3: 6,  LT3: 5,
-  HT4: 4,  LT4: 3,
-  HT5: 2,  LT5: 1,
+  HT1: 100, LT1: 90,
+  HT2: 80,  LT2: 70,
+  HT3: 60,  LT3: 50,
+  HT4: 40,  LT4: 30,
+  HT5: 20,  LT5: 10,
 };
 
 // Best-to-worst order, used for sorting a single gamemode leaderboard.
@@ -27,14 +27,14 @@ const GAMEMODES = [
 // Fixed region order used for the region tabs (regardless of what's in the data).
 const REGIONS = ["NA", "EU", "AS", "ME", "AU"];
 
-// 0-100 score: how close a player is, on average, to HT1 (best) across every
-// gamemode they have a tier in. Being HT1 in just one gamemode still hits 100.
+// Overall score: sum of a player's points across every gamemode they have a
+// tier in. More gamemodes tested (and higher tiers) means a higher score \u2014
+// this rewards being ranked in more gamemodes, not just being good at one.
 function overallScore(player) {
-  const tiers = Object.values(player.tiers);
-  if (tiers.length === 0) return 0;
-  const raw = tiers.reduce((sum, tier) => sum + (TIER_POINTS[tier] || 0), 0);
-  const max = tiers.length * TIER_POINTS.HT1;
-  return Math.round((raw / max) * 100);
+  return Object.values(player.tiers).reduce(
+    (sum, tier) => sum + (TIER_POINTS[tier] || 0),
+    0
+  );
 }
 
 // All players, ranked by overall score (highest first).
