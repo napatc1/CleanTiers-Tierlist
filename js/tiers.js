@@ -13,14 +13,15 @@ const TIER_ORDER = ["HT1", "LT1", "HT2", "LT2", "HT3", "LT3", "HT4", "LT4", "HT5
 // Every gamemode CleanTiers tracks. Add more here as you support them —
 // nothing else in the codebase needs to change.
 const GAMEMODES = [
-  { id: "vanilla", label: "Vanilla" },
-  { id: "uhc",     label: "UHC" },
-  { id: "pot",     label: "Pot" },
-  { id: "nethop",  label: "NethOP" },
-  { id: "smp",     label: "SMP" },
-  { id: "sword",   label: "Sword" },
-  { id: "axe",     label: "Axe" },
-  { id: "mace",    label: "Mace" },
+  { id: "vanilla", label: "Vanilla", icon: "images/vanilla-icon.svg" },
+  { id: "uhc",     label: "UHC",     icon: "images/uhc-icon.svg" },
+  { id: "pot",     label: "Pot",     icon: "images/pot-icon.svg" },
+  { id: "nethop",  label: "NethOP",  icon: "images/nethop-icon.svg" },
+  { id: "smp",     label: "SMP",     icon: "images/smp-icon.svg" },
+  { id: "sword",   label: "Sword",   icon: "images/sword-icon.svg" },
+  { id: "axe",     label: "Axe",     icon: "images/axe-icon.svg" },
+  { id: "mace",    label: "Mace",    icon: "images/mace-icon.svg" },
+  { id: "cart",    label: "Cart",    icon: "images/cart-icon.svg" },
 ];
 
 // Fixed region order used for the region tabs (regardless of what's in the data).
