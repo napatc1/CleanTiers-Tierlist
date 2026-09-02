@@ -35,15 +35,20 @@ header h1 {
   background: #5865f2;
   color: #ffffff;
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 8px 14px;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: background 0.15s;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .discord-btn:hover {
   background: #4752c4;
+  transform: translateY(-1px);
+}
+
+.discord-btn:active {
+  transform: translateY(0);
 }
 
 nav {
@@ -62,15 +67,20 @@ nav {
   background: #232323;
   color: #cfcfcf;
   border: 1px solid #333;
-  border-radius: 6px;
-  padding: 8px 16px;
+  border-radius: 999px;
+  padding: 8px 18px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
 }
 
 .tab-btn:hover {
   background: #2c2c2c;
+  transform: translateY(-1px);
+}
+
+.tab-btn:active {
+  transform: translateY(0);
 }
 
 .tab-btn.active {
@@ -80,14 +90,74 @@ nav {
   font-weight: 600;
 }
 
+.select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #999;
+  border-bottom: 2px solid #999;
+  transform: rotate(45deg);
+  pointer-events: none;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.select-wrap:hover::after {
+  border-color: #ffd54a;
+}
+
 select {
+  appearance: none;
+  -webkit-appearance: none;
   background: #232323;
   color: #cfcfcf;
   border: 1px solid #333;
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 10px;
+  padding: 8px 34px 8px 14px;
   font-size: 0.9rem;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+select:hover {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+select:focus {
+  outline: none;
+  border-color: #ffd54a;
+}
+
+#search-input {
+  background: #232323;
+  color: #e8e8e8;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  min-width: 180px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+#search-input:hover {
+  background: #2a2a2a;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: #ffd54a;
+}
+
+#search-input::placeholder {
+  color: #777;
 }
 
 main {
@@ -100,13 +170,39 @@ main {
   font-size: 1.2rem;
   color: #ffffff;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+
+.title-icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #ffd54a;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.back-btn:hover {
+  transform: translateX(-3px);
+  opacity: 0.85;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background: #1a1a1a;
-  border-radius: 8px;
+  border-radius: 14px;
   overflow: hidden;
 }
 
@@ -128,6 +224,19 @@ th {
 
 tbody tr {
   border-top: 1px solid #262626;
+  animation: rowIn 0.25s ease both;
+  transition: background 0.15s ease;
+}
+
+tbody tr:nth-child(1) { animation-delay: 0.01s; }
+tbody tr:nth-child(2) { animation-delay: 0.03s; }
+tbody tr:nth-child(3) { animation-delay: 0.05s; }
+tbody tr:nth-child(4) { animation-delay: 0.07s; }
+tbody tr:nth-child(5) { animation-delay: 0.09s; }
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 tbody tr:hover {
@@ -141,3 +250,133 @@ tr.rank-3 { background: rgba(205, 127, 50, 0.12); }
 tr.rank-1 td:first-child { color: #ffd700; font-weight: 700; }
 tr.rank-2 td:first-child { color: #c0c0c0; font-weight: 700; }
 tr.rank-3 td:first-child { color: #cd7f32; font-weight: 700; }
+
+.player-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.player-link:hover {
+  background: #262626;
+  color: #ffd54a;
+  transform: translateX(2px);
+}
+
+.player-head {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  animation: rowIn 0.3s ease both;
+}
+
+.profile-head {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-name {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.profile-meta {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-region, .profile-score {
+  background: #232323;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #cfcfcf;
+}
+
+.profile-score {
+  background: rgba(255, 213, 74, 0.15);
+  color: #ffd54a;
+  font-weight: 600;
+}
+
+.profile-tiers {
+  background: #1a1a1a;
+  border-radius: 16px;
+  overflow: hidden;
+  animation: rowIn 0.35s ease both;
+}
+
+.profile-tier-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid #262626;
+  transition: background 0.15s ease;
+}
+
+.profile-tier-row:first-child {
+  border-top: none;
+}
+
+.profile-tier-row:hover {
+  background: #202020;
+}
+
+.profile-gamemode {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.gamemode-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.profile-tier-value {
+  font-weight: 700;
+  color: #ffd54a;
+  background: rgba(255, 213, 74, 0.1);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+}
+
+.empty-state {
+  color: #888;
+  text-align: center;
+  padding: 24px;
+}
