@@ -15,9 +15,15 @@ function headUrl(name, size) {
   return `https://mc-heads.net/avatar/${encodeURIComponent(name)}/${size}`;
 }
 
+// Firebase Realtime Database REST endpoint. Public reads only — writes
+// happen exclusively through the Discord bot's service account.
+const FIREBASE_URL = "https://cleantiers-default-rtdb.asia-southeast1.firebasedatabase.app";
+
 async function loadPlayers() {
-  const res = await fetch("data/players.json");
-  PLAYERS = await res.json();
+  const res = await fetch(`${FIREBASE_URL}/players.json`);
+  const data = await res.json();
+  // Firebase stores players as an object keyed by name, not an array.
+  PLAYERS = data ? Object.values(data) : [];
 }
 
 function buildNav() {
