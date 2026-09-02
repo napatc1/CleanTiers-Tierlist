@@ -184,6 +184,16 @@ function renderTable(players, columns) {
   });
 }
 
+// Warm colors for HT tiers (rank 1 = brightest gold), cool colors for LT
+// tiers (rank 1 = brightest cyan), getting duller as the tier drops.
+function tierColor(tier) {
+  const isHT = tier.startsWith("HT");
+  const rank = parseInt(tier.slice(2), 10) - 1; // 0-4
+  const warm = ["#ffd700", "#ffb84d", "#ff9800", "#ff7043", "#e64a19"];
+  const cool = ["#4fc3f7", "#42a5f5", "#5c6bc0", "#7e57c2", "#8e24aa"];
+  return (isHT ? warm : cool)[rank] || "#999";
+}
+
 function renderProfile(playerName) {
   const player = PLAYERS.find((p) => p.name === playerName);
   const container = document.getElementById("leaderboard");
@@ -198,16 +208,15 @@ function renderProfile(playerName) {
   }
 
   const score = overallScore(player);
-  const gamemodeRows = GAMEMODES.filter((gm) => player.tiers[gm.id])
+  const tierIcons = GAMEMODES.filter((gm) => player.tiers[gm.id])
     .map((gm) => {
       const tier = player.tiers[gm.id];
       return `
-        <div class="profile-tier-row">
-          <span class="profile-gamemode">
-            ${gm.icon ? `<img src="${gm.icon}" alt="" class="gamemode-icon" />` : ""}
-            ${gm.label}
-          </span>
-          <span class="profile-tier-value">${tier}</span>
+        <div class="profile-tier-item" title="${gm.label}">
+          <div class="profile-tier-icon-box">
+            ${gm.icon ? `<img src="${gm.icon}" alt="${gm.label}" class="gamemode-icon" />` : ""}
+          </div>
+          <span class="profile-tier-label" style="color:${tierColor(tier)}">${tier}</span>
         </div>
       `;
     })
@@ -219,13 +228,21 @@ function renderProfile(playerName) {
       <div class="profile-info">
         <h2 class="profile-name">${escapeHtml(player.name)}</h2>
         <div class="profile-meta">
-          <span class="profile-region">${player.region}</span>
           <span class="profile-score">${score} overall</span>
         </div>
       </div>
     </div>
-    <div class="profile-tiers">
-      ${gamemodeRows || `<p class="empty-state">No tiers recorded yet.</p>`}
+    <div class="profile-details">
+      <div class="profile-detail-col">
+        <div class="detail-label">Region</div>
+        <div class="profile-region-badge">${player.region}</div>
+      </div>
+      <div class="profile-detail-col profile-detail-col-grow">
+        <div class="detail-label">Tiers</div>
+        <div class="profile-tier-icons">
+          ${tierIcons || `<p class="empty-state">No tiers recorded yet.</p>`}
+        </div>
+      </div>
     </div>
   `;
 }
