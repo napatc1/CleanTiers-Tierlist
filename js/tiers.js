@@ -1,0 +1,60 @@
+// Tier -> point value. Higher tier = more points.
+const TIER_POINTS = {
+  HT1: 10, LT1: 9,
+  HT2: 8,  LT2: 7,
+  HT3: 6,  LT3: 5,
+  HT4: 4,  LT4: 3,
+  HT5: 2,  LT5: 1,
+};
+
+// Best-to-worst order, used for sorting a single gamemode leaderboard.
+const TIER_ORDER = ["HT1", "LT1", "HT2", "LT2", "HT3", "LT3", "HT4", "LT4", "HT5", "LT5"];
+
+// Every gamemode CleanTiers tracks. Add more here as you support them —
+// nothing else in the codebase needs to change.
+const GAMEMODES = [
+  { id: "vanilla", label: "Vanilla" },
+  { id: "uhc",     label: "UHC" },
+  { id: "pot",     label: "Pot" },
+  { id: "nethop",  label: "NethOP" },
+  { id: "smp",     label: "SMP" },
+  { id: "sword",   label: "Sword" },
+  { id: "axe",     label: "Axe" },
+  { id: "mace",    label: "Mace" },
+];
+
+// Fixed region order used for the region tabs (regardless of what's in the data).
+const REGIONS = ["NA", "EU", "AS", "ME", "AU"];
+
+// 0-100 score: how close a player is, on average, to HT1 (best) across every
+// gamemode they have a tier in. Being HT1 in just one gamemode still hits 100.
+function overallScore(player) {
+  const tiers = Object.values(player.tiers);
+  if (tiers.length === 0) return 0;
+  const raw = tiers.reduce((sum, tier) => sum + (TIER_POINTS[tier] || 0), 0);
+  const max = tiers.length * TIER_POINTS.HT1;
+  return Math.round((raw / max) * 100);
+}
+
+// All players, ranked by overall score (highest first).
+function getOverallLeaderboard(players) {
+  return [...players].sort((a, b) => overallScore(b) - overallScore(a));
+}
+
+// Players in one region, ranked by overall score.
+function getRegionLeaderboard(players, region) {
+  return getOverallLeaderboard(players.filter((p) => p.region === region));
+}
+
+// Players who have a tier in one gamemode, ranked by that tier (not score).
+function getGamemodeLeaderboard(players, gamemode) {
+  return players
+    .filter((p) => p.tiers && p.tiers[gamemode])
+    .sort(
+      (a, b) =>
+        TIER_ORDER.indexOf(a.tiers[gamemode]) -
+        TIER_ORDER.indexOf(b.tiers[gamemode])
+    );
+}
+
+

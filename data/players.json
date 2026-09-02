@@ -1,0 +1,80 @@
+[
+  {
+    "name": "Frostbyte",
+    "region": "NA",
+    "tiers": {
+      "vanilla": "HT1",
+      "uhc": "HT1",
+      "pot": "LT1",
+      "sword": "HT2"
+    }
+  },
+  {
+    "name": "Kestrel",
+    "region": "EU",
+    "tiers": {
+      "vanilla": "LT1",
+      "uhc": "HT2",
+      "nethop": "HT1",
+      "smp": "LT2",
+      "axe": "HT3"
+    }
+  },
+  {
+    "name": "Yumeko",
+    "region": "AS",
+    "tiers": {
+      "pot": "HT1",
+      "nethop": "LT1",
+      "sword": "HT1",
+      "mace": "HT2"
+    }
+  },
+  {
+    "name": "Zaraqi",
+    "region": "ME",
+    "tiers": {
+      "smp": "HT2",
+      "axe": "LT2",
+      "vanilla": "HT3",
+      "mace": "LT1"
+    }
+  },
+  {
+    "name": "Outbacker",
+    "region": "AU",
+    "tiers": {
+      "uhc": "LT2",
+      "pot": "HT3",
+      "sword": "LT3",
+      "nethop": "HT4"
+    }
+  },
+  {
+    "name": "Glacius",
+    "region": "NA",
+    "tiers": {
+      "vanilla": "HT4",
+      "smp": "LT3",
+      "axe": "HT5"
+    }
+  },
+  {
+    "name": "Marielune",
+    "region": "EU",
+    "tiers": {
+      "pot": "LT3",
+      "mace": "HT4",
+      "uhc": "LT4"
+    }
+  },
+  {
+    "name": "Tatsuo",
+    "region": "AS",
+    "tiers": {
+      "sword": "HT5",
+      "nethop": "LT4",
+      "vanilla": "LT5"
+    }
+  }
+]
