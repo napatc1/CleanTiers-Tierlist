@@ -172,9 +172,12 @@ function renderTable(players, columns) {
           .map((gm) => {
             const tier = player.tiers[gm.id];
             return `
-              <span class="mini-tier-badge" title="${gm.label}: ${tier}">
-                ${gm.icon ? `<img src="${gm.icon}" alt="" class="mini-tier-icon" />` : ""}
-              </span>
+              <div class="mini-tier-item" title="${gm.label}: ${tier}">
+                <span class="mini-tier-badge">
+                  ${gm.icon ? `<img src="${gm.icon}" alt="" class="mini-tier-icon" />` : ""}
+                </span>
+                <span class="mini-tier-label" style="color:${tierColor(tier)}">${tier}</span>
+              </div>
             `;
           })
           .join("")
