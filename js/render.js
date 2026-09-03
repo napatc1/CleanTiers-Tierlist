@@ -138,7 +138,10 @@ function renderTable(players, columns) {
   const title = document.getElementById("view-title");
   title.classList.remove("profile-mode");
 
+  const showTiers = columns === "score";
+
   const table = document.createElement("table");
+  if (showTiers) table.classList.add("with-tiers");
   const thead = document.createElement("thead");
   thead.innerHTML = `
     <tr>
@@ -146,6 +149,7 @@ function renderTable(players, columns) {
       <th>Player</th>
       <th>Region</th>
       <th>${columns === "score" ? "Score" : "Tier"}</th>
+      ${showTiers ? "<th>Tiers</th>" : ""}
     </tr>
   `;
   table.appendChild(thead);
@@ -162,6 +166,20 @@ function renderTable(players, columns) {
         : player.tiers[currentView.value];
 
     const safeName = escapeHtml(player.name);
+
+    const tierBadges = showTiers
+      ? GAMEMODES.filter((gm) => player.tiers[gm.id])
+          .map((gm) => {
+            const tier = player.tiers[gm.id];
+            return `
+              <span class="mini-tier-badge" title="${gm.label}: ${tier}">
+                ${gm.icon ? `<img src="${gm.icon}" alt="" class="mini-tier-icon" />` : ""}
+              </span>
+            `;
+          })
+          .join("")
+      : "";
+
     tr.innerHTML = `
       <td>${rank}</td>
       <td>
@@ -172,6 +190,7 @@ function renderTable(players, columns) {
       </td>
       <td>${player.region}</td>
       <td>${value}</td>
+      ${showTiers ? `<td><div class="mini-tier-row">${tierBadges}</div></td>` : ""}
     `;
     tbody.appendChild(tr);
   });

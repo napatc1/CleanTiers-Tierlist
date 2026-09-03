@@ -230,6 +230,35 @@ th:nth-child(2) { width: 52%; }
 th:nth-child(3) { width: 20%; text-align: left; }
 th:nth-child(4) { width: 20%; text-align: left; }
 
+table.with-tiers th:nth-child(1) { width: 6%; }
+table.with-tiers th:nth-child(2) { width: 30%; }
+table.with-tiers th:nth-child(3) { width: 12%; }
+table.with-tiers th:nth-child(4) { width: 12%; }
+table.with-tiers th:nth-child(5) { width: 40%; }
+
+.mini-tier-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mini-tier-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #1c2128;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mini-tier-icon {
+  width: 15px;
+  height: 15px;
+}
+
 thead tr {
   border-bottom: 1px solid var(--line);
 }
