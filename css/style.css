@@ -216,7 +216,13 @@ main {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
+
+th:nth-child(1) { width: 50px; }
+th:nth-child(2) { width: auto; }
+th:nth-child(3) { width: 110px; text-align: right; }
+th:nth-child(4) { width: 110px; text-align: right; }
 
 thead tr {
   border-bottom: 1px solid var(--line);
@@ -236,6 +242,10 @@ th:first-child { padding-left: 18px; width: 50px; }
 td {
   padding: 13px 16px;
   font-size: 0.92rem;
+}
+
+td:nth-child(3), td:nth-child(4) {
+  text-align: right;
 }
 
 td:first-child {
@@ -405,9 +415,9 @@ td:last-child {
 }
 
 .profile-region-badge {
-  background: rgba(255, 122, 69, 0.12);
-  border: 1px solid rgba(255, 122, 69, 0.3);
-  color: var(--ember);
+  background: var(--accent-dim);
+  border: 1px solid rgba(63, 160, 245, 0.3);
+  color: var(--accent);
   font-family: "JetBrains Mono", monospace;
   font-weight: 700;
   font-size: 0.85rem;
