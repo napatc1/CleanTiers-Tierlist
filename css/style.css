@@ -167,8 +167,8 @@ select:focus {
 /* ---------- main / leaderboard ---------- */
 
 main {
-  padding: 28px 32px 60px;
-  max-width: 760px;
+  padding: 32px 32px 80px;
+  max-width: 880px;
   margin: 0 auto;
 }
 
@@ -279,28 +279,10 @@ tbody tr:hover {
 
 tr.rank-1 {
   border-left-color: var(--accent);
-  position: relative;
 }
 
 tr.rank-1 td:first-child {
   color: var(--accent);
-}
-
-/* The one deliberate animated moment on the page: a slow blue shimmer
-   sweeping across the #1 row only. */
-tr.rank-1::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 30%, rgba(63, 160, 245, 0.08) 50%, transparent 70%);
-  background-size: 200% 100%;
-  animation: shimmer 5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -50% 0; }
 }
 
 tr.rank-2 { border-left-color: #b8bcc2; }
