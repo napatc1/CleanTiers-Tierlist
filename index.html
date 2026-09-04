@@ -22,8 +22,11 @@
     </div>
     <nav>
       <div id="nav-tabs"></div>
-      <div class="select-wrap">
-        <select id="gamemode-select"></select>
+      <div class="custom-select" id="gamemode-dropdown">
+        <button type="button" class="custom-select-trigger" id="gamemode-trigger">
+          Gamemode <span class="custom-select-arrow"></span>
+        </button>
+        <div class="custom-select-menu" id="gamemode-menu"></div>
       </div>
       <input type="text" id="search-input" placeholder="Search player..." />
     </nav>
