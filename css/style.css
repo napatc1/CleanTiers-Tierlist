@@ -113,41 +113,95 @@ nav {
   border-color: var(--accent);
 }
 
-.select-wrap {
+.custom-select {
   position: relative;
   display: inline-flex;
+}
+
+.custom-select-trigger {
+  display: inline-flex;
   align-items: center;
-}
-
-.select-wrap::after {
-  content: "";
-  position: absolute;
-  right: 13px;
-  width: 6px;
-  height: 6px;
-  border-right: 2px solid var(--text-dim);
-  border-bottom: 2px solid var(--text-dim);
-  transform: rotate(45deg);
-  pointer-events: none;
-}
-
-select {
-  appearance: none;
-  -webkit-appearance: none;
+  gap: 8px;
   background: transparent;
   color: var(--text-dim);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 7px 32px 7px 14px;
+  padding: 7px 14px;
   font-family: "Space Grotesk", sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-select:focus {
-  outline: none;
+.custom-select-trigger:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.custom-select.open .custom-select-trigger {
   border-color: var(--accent);
+  color: var(--text);
+}
+
+.custom-select-arrow {
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  opacity: 0.6;
+}
+
+.custom-select.open .custom-select-arrow {
+  transform: rotate(-135deg);
+}
+
+.custom-select-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 160px;
+  background: #14171c;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+}
+
+.custom-select.open .custom-select-menu {
+  display: block;
+  animation: rowIn 0.15s ease both;
+}
+
+.custom-select-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.custom-select-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.custom-select-item.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 #search-input {
@@ -385,9 +439,9 @@ td:last-child {
 }
 
 .profile-head {
-  width: 84px;
-  height: 84px;
-  border-radius: 10px;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
   display: block;
   image-rendering: pixelated;
   border: 1px solid var(--line);

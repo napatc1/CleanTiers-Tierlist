@@ -28,9 +28,7 @@ async function loadPlayers() {
 
 function buildNav() {
   const nav = document.getElementById("nav-tabs");
-  const gamemodeSelect = document.getElementById("gamemode-select");
   nav.innerHTML = "";
-  gamemodeSelect.innerHTML = "";
 
   // Overall tab (the landing view: every region combined)
   const overallBtn = document.createElement("button");
@@ -48,20 +46,33 @@ function buildNav() {
     nav.appendChild(btn);
   });
 
-  // Gamemode dropdown
-  const gmPlaceholder = document.createElement("option");
-  gmPlaceholder.textContent = "Gamemode \u2193";
-  gmPlaceholder.disabled = true;
-  gmPlaceholder.selected = true;
-  gamemodeSelect.appendChild(gmPlaceholder);
+  // Custom gamemode dropdown (native <select> can't be styled once open,
+  // so this is a fully custom button + menu instead).
+  const trigger = document.getElementById("gamemode-trigger");
+  const menu = document.getElementById("gamemode-menu");
+  const dropdown = document.getElementById("gamemode-dropdown");
+  menu.innerHTML = "";
+
   GAMEMODES.forEach((gm) => {
-    const opt = document.createElement("option");
-    opt.value = gm.id;
-    opt.textContent = gm.label;
-    gamemodeSelect.appendChild(opt);
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "custom-select-item";
+    item.textContent = gm.label;
+    item.dataset.gamemode = gm.id;
+    item.onclick = () => {
+      dropdown.classList.remove("open");
+      setView({ type: "gamemode", value: gm.id });
+    };
+    menu.appendChild(item);
   });
-  gamemodeSelect.onchange = () =>
-    setView({ type: "gamemode", value: gamemodeSelect.value });
+
+  trigger.onclick = (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle("open");
+  };
+
+  // Close the menu on any click outside it.
+  document.addEventListener("click", () => dropdown.classList.remove("open"));
 
   // Search box: filters whatever view is currently showing, doesn't change it
   const searchInput = document.getElementById("search-input");
@@ -81,7 +92,7 @@ function setView(view) {
   // Highlight the active tab (Overall or a region), reset the gamemode
   // dropdown whenever a tab is picked instead. Skipped on the profile view,
   // which isn't one of the nav tabs.
-  const gamemodeSelect = document.getElementById("gamemode-select");
+  const trigger = document.getElementById("gamemode-trigger");
   if (view.type !== "player") {
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       const isActive =
@@ -90,8 +101,15 @@ function setView(view) {
       btn.classList.toggle("active", isActive);
     });
 
-    if (view.type !== "gamemode") {
-      gamemodeSelect.selectedIndex = 0;
+    document.querySelectorAll(".custom-select-item").forEach((item) => {
+      item.classList.toggle("active", view.type === "gamemode" && item.dataset.gamemode === view.value);
+    });
+
+    if (view.type === "gamemode") {
+      const gm = GAMEMODES.find((g) => g.id === view.value);
+      trigger.innerHTML = `${gm.label} <span class="custom-select-arrow"></span>`;
+    } else {
+      trigger.innerHTML = `Gamemode <span class="custom-select-arrow"></span>`;
     }
   }
 
@@ -217,7 +235,9 @@ function tierColor(tier) {
 }
 
 function renderProfile(playerName) {
-  const player = PLAYERS.find((p) => p.name === playerName);
+  const player = PLAYERS.find(
+    (p) => p.name.toLowerCase() === playerName.toLowerCase()
+  );
   const container = document.getElementById("leaderboard");
   const title = document.getElementById("view-title");
   title.classList.add("profile-mode");
