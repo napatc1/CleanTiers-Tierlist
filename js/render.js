@@ -447,6 +447,22 @@ function renderHome() {
 
 // Small fixed widget in the bottom-left showing tests happening right now.
 // Shown on every page (not just Home) since it's meant to always be visible.
+// Compact row for the bottom-left Live Now widget: head, name + gamemode
+// stacked, tier pulled to the right. No tester info shown here (kept for
+// the main Home list instead) to keep this widget small.
+function liveNowRowHtml(entry) {
+  const gm = GAMEMODES.find((g) => g.id === entry.gamemode) || { label: entry.gamemode };
+  return `
+    <div class="live-row">
+      <img src="${headUrl(entry.testeeName, 32)}" alt="" class="live-row-head" />
+      <div class="live-row-info">
+        <div class="live-row-name">${escapeHtml(entry.testeeName)}</div>
+        <div class="live-row-gamemode">${escapeHtml(gm.label)}</div>
+      </div>
+    </div>
+  `;
+}
+
 function renderLiveNowWidget() {
   const widget = document.getElementById("live-now-widget");
   if (LIVE_TESTS.length === 0) {
@@ -456,8 +472,13 @@ function renderLiveNowWidget() {
   }
   widget.classList.add("visible");
   widget.innerHTML = `
-    <div class="live-now-title">Live Now</div>
-    ${LIVE_TESTS.map((t) => testRowHtml(t.testeeName, t.gamemode, null, t.testerNames)).join("")}
+    <div class="live-now-header">
+      <span class="live-now-title">Live Now</span>
+      <span class="live-now-count">${LIVE_TESTS.length}</span>
+    </div>
+    <div class="live-now-rows">
+      ${LIVE_TESTS.map(liveNowRowHtml).join("")}
+    </div>
   `;
 }
 
