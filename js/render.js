@@ -387,6 +387,7 @@ function setPage(page) {
   }
 
   renderLiveNowWidget();
+  renderRecentTestsWidget();
 }
 
 // One row of a "who tested who" list: testee head+name, gamemode icon,
@@ -425,31 +426,14 @@ function renderHome() {
   title.textContent = "Home";
   title.classList.remove("profile-mode");
 
-  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
-  const recent = RESULTS_LOG.filter((r) => r.timestamp >= cutoff).sort(
-    (a, b) => b.timestamp - a.timestamp
-  );
-
   const container = document.getElementById("leaderboard");
-  if (recent.length === 0) {
-    container.innerHTML = `<p class="empty-state">No tests in the last 48 hours yet.</p>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="test-list">
-      ${recent
-        .map((r) => testRowHtml(r.testeeName, r.gamemode, r.tier, r.testerNames))
-        .join("")}
-    </div>
-  `;
+  container.innerHTML = `<p class="empty-state">Check the corner for active tickets and recent tests.</p>`;
 }
 
 // Small fixed widget in the bottom-left showing tests happening right now.
 // Shown on every page (not just Home) since it's meant to always be visible.
-// Compact row for the bottom-left Live Now widget: head, name + gamemode
-// stacked, tier pulled to the right. No tester info shown here (kept for
-// the main Home list instead) to keep this widget small.
+// Compact row for the bottom-left widgets: head, name + gamemode stacked,
+// optionally a tier badge pulled to the right (only for completed tests).
 function liveNowRowHtml(entry) {
   const gm = GAMEMODES.find((g) => g.id === entry.gamemode) || { label: entry.gamemode };
   return `
@@ -459,13 +443,14 @@ function liveNowRowHtml(entry) {
         <div class="live-row-name">${escapeHtml(entry.testeeName)}</div>
         <div class="live-row-gamemode">${escapeHtml(gm.label)}</div>
       </div>
+      ${entry.tier ? `<span class="live-row-tier" style="color:${tierColor(entry.tier)}">${entry.tier}</span>` : ""}
     </div>
   `;
 }
 
 function renderLiveNowWidget() {
   const widget = document.getElementById("live-now-widget");
-  if (LIVE_TESTS.length === 0) {
+  if (currentPage !== "home" || LIVE_TESTS.length === 0) {
     widget.innerHTML = "";
     widget.classList.remove("visible");
     return;
@@ -473,11 +458,43 @@ function renderLiveNowWidget() {
   widget.classList.add("visible");
   widget.innerHTML = `
     <div class="live-now-header">
-      <span class="live-now-title">Live Now</span>
+      <span class="live-now-title">Active Tickets</span>
       <span class="live-now-count">${LIVE_TESTS.length}</span>
     </div>
     <div class="live-now-rows">
       ${LIVE_TESTS.map(liveNowRowHtml).join("")}
+    </div>
+  `;
+}
+
+// Bottom-left widget showing every completed test from the last 48 hours.
+function renderRecentTestsWidget() {
+  const widget = document.getElementById("recent-tests-widget");
+  if (currentPage !== "home") {
+    widget.innerHTML = "";
+    widget.classList.remove("visible");
+    return;
+  }
+
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const recent = RESULTS_LOG.filter((r) => r.timestamp >= cutoff).sort(
+    (a, b) => b.timestamp - a.timestamp
+  );
+
+  if (recent.length === 0) {
+    widget.innerHTML = "";
+    widget.classList.remove("visible");
+    return;
+  }
+
+  widget.classList.add("visible");
+  widget.innerHTML = `
+    <div class="live-now-header">
+      <span class="live-now-title recent-tests-title">Recent Tests</span>
+      <span class="live-now-count recent-tests-badge">48H</span>
+    </div>
+    <div class="live-now-rows">
+      ${recent.map(liveNowRowHtml).join("")}
     </div>
   `;
 }
