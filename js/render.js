@@ -13,6 +13,7 @@ let previousListView = { type: "overall" }; // remembered so the profile's Back 
 let searchQuery = "";
 let selectedRegions = new Set(); // empty = no filter, show every region
 let selectedTiers = new Set(); // empty = no filter, show every tier
+let testersSearchQuery = "";
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -427,7 +428,41 @@ function renderHome() {
   title.classList.remove("profile-mode");
 
   const container = document.getElementById("leaderboard");
-  container.innerHTML = `<p class="empty-state">Check the corner for active tickets and recent tests.</p>`;
+  container.innerHTML = `
+    <div class="home-overview">
+      <section class="home-section">
+        <h3>Welcome to CleanTiers</h3>
+        <p>CleanTiers ranks players by skill in Minecraft PvP gamemodes. Get tested by a staff tester in Discord, and your tier shows up here automatically.</p>
+      </section>
+
+      <section class="home-section">
+        <h3>How Testing Works</h3>
+        <ol class="home-steps">
+          <li>Run <code>/verify username:&lt;your IGN&gt;</code> once in Discord to link your Minecraft account.</li>
+          <li>Head to the gamemode's channel and click <strong>Join Queue</strong> on the queue message.</li>
+          <li>Wait for a tester to click <strong>Next</strong> and pull you into a private ticket.</li>
+          <li>Play your test with the tester(s) in that ticket.</li>
+          <li>Once finished, the tester submits your result and your tier appears on the Leaderboard.</li>
+        </ol>
+      </section>
+
+      <section class="home-section">
+        <h3>Rules</h3>
+        <ul class="home-rules">
+          <li>Be respectful to testers and other players in the queue at all times.</li>
+          <li>No cheating, hacked clients, or exploiting bugs during a test.</li>
+          <li>Don't leave mid-test unless something's genuinely wrong — testers are volunteering their time.</li>
+          <li>There's a cooldown after each test before you can queue again for the same gamemode.</li>
+          <li>Tier decisions are final unless a manager/admin reviews and overturns them.</li>
+        </ul>
+      </section>
+
+      <section class="home-section">
+        <h3>Where To Look</h3>
+        <p>The bottom-left corner shows <strong>Active Tickets</strong> (tests happening right now) and <strong>Recent Tests</strong> from the last 48 hours. Check the <strong>Leaderboard</strong> tab for rankings, or <strong>Testers</strong> for who's been doing the testing.</p>
+      </section>
+    </div>
+  `;
 }
 
 // Small fixed widget in the bottom-left showing tests happening right now.
@@ -512,21 +547,22 @@ function renderTesters() {
     });
   });
 
-  const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  let sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  if (testersSearchQuery) {
+    sorted = sorted.filter(([name]) => name.toLowerCase().includes(testersSearchQuery));
+  }
+
   const container = document.getElementById("leaderboard");
 
-  if (sorted.length === 0) {
+  if (counts.size === 0) {
     container.innerHTML = `<p class="empty-state">No completed tests logged yet.</p>`;
     return;
   }
 
-  container.innerHTML = `
-    <table>
-      <thead>
-        <tr><th>#</th><th>Tester</th><th>Tests Done</th></tr>
-      </thead>
-      <tbody>
-        ${sorted
+  const rowsHtml =
+    sorted.length === 0
+      ? `<tr><td colspan="3"><p class="empty-state">No testers match "${escapeHtml(testersSearchQuery)}".</p></td></tr>`
+      : sorted
           .map(
             ([name, count], i) => `
               <tr class="${i < 3 ? `rank-${i + 1}` : ""}">
@@ -541,10 +577,29 @@ function renderTesters() {
               </tr>
             `
           )
-          .join("")}
+          .join("");
+
+  container.innerHTML = `
+    <input type="text" id="testers-search-input" placeholder="Search testers..." value="${escapeHtml(testersSearchQuery)}" class="testers-search" />
+    <table>
+      <thead>
+        <tr><th>#</th><th>Tester</th><th>Tests Done</th></tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
       </tbody>
     </table>
   `;
+
+  const searchInput = document.getElementById("testers-search-input");
+  searchInput.oninput = () => {
+    testersSearchQuery = searchInput.value.trim().toLowerCase();
+    renderTesters();
+  };
+  if (testersSearchQuery) {
+    searchInput.focus();
+    searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+  }
 }
 
 async function init() {

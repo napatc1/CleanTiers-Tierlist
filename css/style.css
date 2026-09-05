@@ -953,3 +953,77 @@ td:last-child {
     width: auto;
   }
 }
+
+/* ---------- home overview ---------- */
+
+.home-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.home-section h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.home-section p {
+  margin: 0;
+  color: var(--text-dim);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.home-section p strong {
+  color: var(--text);
+}
+
+.home-steps,
+.home-rules {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  font-size: 0.92rem;
+}
+
+.home-steps li strong,
+.home-rules li strong {
+  color: var(--text);
+}
+
+.home-steps code {
+  background: rgba(63, 160, 245, 0.12);
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem;
+}
+
+/* ---------- testers tab search ---------- */
+
+.testers-search {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 18px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.9rem;
+}
+
+.testers-search:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.testers-search::placeholder {
+  color: #5c6066;
+}
