@@ -302,7 +302,17 @@ main {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  min-width: 480px;
+}
+
+table.with-tiers {
+  min-width: 640px;
 }
 
 table {
@@ -583,4 +593,96 @@ td:last-child {
   text-align: center;
   padding: 24px 0;
   font-size: 0.9rem;
+}
+
+/* ---------- mobile ---------- */
+
+@media (max-width: 680px) {
+  header {
+    padding: 14px 16px;
+  }
+
+  .header-top {
+    margin-bottom: 10px;
+  }
+
+  header h1 {
+    font-size: 1.15rem;
+  }
+
+  .discord-btn span {
+    display: none;
+  }
+
+  .discord-btn {
+    padding: 8px;
+  }
+
+  nav {
+    gap: 8px;
+  }
+
+  #nav-tabs {
+    gap: 6px;
+  }
+
+  .tab-btn,
+  .custom-select-trigger {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  #search-input {
+    flex: 1 1 100%;
+    order: 10;
+    min-width: 0;
+  }
+
+  main {
+    padding: 20px 14px 50px;
+  }
+
+  #view-title {
+    font-size: 0.95rem;
+  }
+
+  td, th {
+    padding: 10px 12px;
+  }
+
+  th:first-child, td:first-child {
+    padding-left: 14px;
+  }
+
+  .player-link span {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-card {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    padding-bottom: 18px;
+  }
+
+  .profile-info {
+    align-items: center;
+  }
+
+  .profile-details {
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px;
+  }
+
+  .profile-tier-icons {
+    justify-content: center;
+  }
+
+  .custom-select-menu {
+    max-width: calc(100vw - 32px);
+  }
 }
