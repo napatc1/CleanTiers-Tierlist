@@ -193,6 +193,38 @@ nav {
   transition: background 0.12s ease, color 0.12s ease;
 }
 
+.custom-select-menu-checkbox {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.custom-select-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.custom-select-checkbox-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.custom-select-checkbox-item input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
 .custom-select-item:hover {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text);

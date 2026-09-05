@@ -1,9 +1,13 @@
 let PLAYERS = [];
 
-// view = { type: "overall" } | { type: "region", value: "NA" } | { type: "gamemode", value: "vanilla" } | { type: "player", value: "Frostbyte" }
+// view = { type: "overall" } | { type: "gamemode", value: "vanilla" } | { type: "player", value: "Frostbyte" }
+// Region and tier are independent multi-select filters layered on top of
+// whichever view is active, not separate views themselves.
 let currentView = { type: "overall" };
 let previousListView = { type: "overall" }; // remembered so the profile's Back button returns here
 let searchQuery = "";
+let selectedRegions = new Set(); // empty = no filter, show every region
+let selectedTiers = new Set(); // empty = no filter, show every tier
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -26,33 +30,91 @@ async function loadPlayers() {
   PLAYERS = data ? Object.values(data) : [];
 }
 
+// Builds a checkbox-style dropdown menu. onToggle(value, nowChecked) fires
+// per click; the caller decides how that affects filtering/rendering.
+function buildCheckboxMenu(menuEl, options, selectedSet, onToggle) {
+  menuEl.innerHTML = "";
+  options.forEach(({ value, label }) => {
+    const item = document.createElement("label");
+    item.className = "custom-select-checkbox-item";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = selectedSet.has(value);
+    checkbox.onchange = () => onToggle(value, checkbox.checked);
+    item.appendChild(checkbox);
+    item.appendChild(document.createTextNode(label));
+    menuEl.appendChild(item);
+  });
+}
+
+function updateFilterTriggerLabel(triggerId, baseLabel, selectedSet) {
+  const trigger = document.getElementById(triggerId);
+  const text = selectedSet.size > 0 ? `${baseLabel} (${selectedSet.size})` : baseLabel;
+  trigger.innerHTML = `${text} <span class="custom-select-arrow"></span>`;
+}
+
 function buildNav() {
   const nav = document.getElementById("nav-tabs");
   nav.innerHTML = "";
 
-  // Overall tab (the landing view: every region combined)
+  // Overall tab (the only fixed nav tab now — region/tier are filters, and
+  // a gamemode is picked from its own dropdown below).
   const overallBtn = document.createElement("button");
   overallBtn.textContent = "Overall";
-  overallBtn.className = "tab-btn";
+  overallBtn.className = "tab-btn active";
   overallBtn.onclick = () => setView({ type: "overall" });
   nav.appendChild(overallBtn);
 
-  // One tab per region, fixed order: NA, EU, AS, ME, AU
-  REGIONS.forEach((region) => {
-    const btn = document.createElement("button");
-    btn.textContent = region;
-    btn.className = "tab-btn";
-    btn.onclick = () => setView({ type: "region", value: region });
-    nav.appendChild(btn);
+  // Generic open/close wiring shared by all three dropdowns.
+  function wireDropdown(dropdownId, triggerId) {
+    const dropdown = document.getElementById(dropdownId);
+    const trigger = document.getElementById(triggerId);
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const wasOpen = dropdown.classList.contains("open");
+      document.querySelectorAll(".custom-select.open").forEach((d) => d.classList.remove("open"));
+      if (!wasOpen) dropdown.classList.add("open");
+    };
+  }
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".custom-select.open").forEach((d) => d.classList.remove("open"));
   });
 
-  // Custom gamemode dropdown (native <select> can't be styled once open,
-  // so this is a fully custom button + menu instead).
-  const trigger = document.getElementById("gamemode-trigger");
-  const menu = document.getElementById("gamemode-menu");
-  const dropdown = document.getElementById("gamemode-dropdown");
-  menu.innerHTML = "";
+  // Region filter (multi-select checkboxes)
+  wireDropdown("region-dropdown", "region-trigger");
+  buildCheckboxMenu(
+    document.getElementById("region-menu"),
+    REGIONS.map((r) => ({ value: r, label: r })),
+    selectedRegions,
+    (value, checked) => {
+      if (checked) selectedRegions.add(value);
+      else selectedRegions.delete(value);
+      updateFilterTriggerLabel("region-trigger", "Region", selectedRegions);
+      render();
+    }
+  );
+  updateFilterTriggerLabel("region-trigger", "Region", selectedRegions);
 
+  // Tier filter (multi-select checkboxes)
+  wireDropdown("tier-dropdown", "tier-trigger");
+  buildCheckboxMenu(
+    document.getElementById("tier-menu"),
+    TIER_ORDER.map((t) => ({ value: t, label: t })),
+    selectedTiers,
+    (value, checked) => {
+      if (checked) selectedTiers.add(value);
+      else selectedTiers.delete(value);
+      updateFilterTriggerLabel("tier-trigger", "Tier", selectedTiers);
+      render();
+    }
+  );
+  updateFilterTriggerLabel("tier-trigger", "Tier", selectedTiers);
+
+  // Gamemode dropdown (single-select — switches the view, not a filter)
+  wireDropdown("gamemode-dropdown", "gamemode-trigger");
+  const gamemodeDropdown = document.getElementById("gamemode-dropdown");
+  const gamemodeMenu = document.getElementById("gamemode-menu");
+  gamemodeMenu.innerHTML = "";
   GAMEMODES.forEach((gm) => {
     const item = document.createElement("button");
     item.type = "button";
@@ -60,19 +122,11 @@ function buildNav() {
     item.textContent = gm.label;
     item.dataset.gamemode = gm.id;
     item.onclick = () => {
-      dropdown.classList.remove("open");
+      gamemodeDropdown.classList.remove("open");
       setView({ type: "gamemode", value: gm.id });
     };
-    menu.appendChild(item);
+    gamemodeMenu.appendChild(item);
   });
-
-  trigger.onclick = (e) => {
-    e.stopPropagation();
-    dropdown.classList.toggle("open");
-  };
-
-  // Close the menu on any click outside it.
-  document.addEventListener("click", () => dropdown.classList.remove("open"));
 
   // Search box: filters whatever view is currently showing, doesn't change it
   const searchInput = document.getElementById("search-input");
@@ -89,27 +143,23 @@ function setView(view) {
   }
   currentView = view;
 
-  // Highlight the active tab (Overall or a region), reset the gamemode
-  // dropdown whenever a tab is picked instead. Skipped on the profile view,
-  // which isn't one of the nav tabs.
-  const trigger = document.getElementById("gamemode-trigger");
+  // Highlight Overall vs a gamemode. Skipped on the profile view, which
+  // isn't one of the nav tabs.
+  const gamemodeTrigger = document.getElementById("gamemode-trigger");
   if (view.type !== "player") {
     document.querySelectorAll(".tab-btn").forEach((btn) => {
-      const isActive =
-        (view.type === "overall" && btn.textContent === "Overall") ||
-        (view.type === "region" && btn.textContent === view.value);
-      btn.classList.toggle("active", isActive);
+      btn.classList.toggle("active", view.type === "overall" && btn.textContent === "Overall");
     });
 
-    document.querySelectorAll(".custom-select-item").forEach((item) => {
+    document.querySelectorAll("#gamemode-menu .custom-select-item").forEach((item) => {
       item.classList.toggle("active", view.type === "gamemode" && item.dataset.gamemode === view.value);
     });
 
     if (view.type === "gamemode") {
       const gm = GAMEMODES.find((g) => g.id === view.value);
-      trigger.innerHTML = `${gm.label} <span class="custom-select-arrow"></span>`;
+      gamemodeTrigger.innerHTML = `${gm.label} <span class="custom-select-arrow"></span>`;
     } else {
-      trigger.innerHTML = `Gamemode <span class="custom-select-arrow"></span>`;
+      gamemodeTrigger.innerHTML = `Gamemode <span class="custom-select-arrow"></span>`;
     }
   }
 
@@ -129,10 +179,6 @@ function render() {
     title.textContent = "Overall Rankings";
     rows = getOverallLeaderboard(PLAYERS);
     columns = "score";
-  } else if (currentView.type === "region") {
-    title.textContent = `${currentView.value} Rankings`;
-    rows = getRegionLeaderboard(PLAYERS, currentView.value);
-    columns = "score";
   } else {
     const gm = GAMEMODES.find((g) => g.id === currentView.value);
     title.innerHTML = gm.icon
@@ -140,6 +186,18 @@ function render() {
       : `${gm.label} Rankings`;
     rows = getGamemodeLeaderboard(PLAYERS, currentView.value);
     columns = "tier";
+  }
+
+  if (selectedRegions.size > 0) {
+    rows = rows.filter((p) => selectedRegions.has(p.region));
+  }
+
+  if (selectedTiers.size > 0) {
+    rows = rows.filter((p) =>
+      currentView.type === "gamemode"
+        ? selectedTiers.has(p.tiers[currentView.value])
+        : Object.values(p.tiers).some((t) => selectedTiers.has(t))
+    );
   }
 
   if (searchQuery) {
