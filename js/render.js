@@ -1,4 +1,9 @@
 let PLAYERS = [];
+let LIVE_TESTS = [];
+let RESULTS_LOG = [];
+
+// page = "home" | "leaderboard" | "testers"
+let currentPage = "home";
 
 // view = { type: "overall" } | { type: "gamemode", value: "vanilla" } | { type: "player", value: "Frostbyte" }
 // Region and tier are independent multi-select filters layered on top of
@@ -30,6 +35,18 @@ async function loadPlayers() {
   PLAYERS = data ? Object.values(data) : [];
 }
 
+async function loadLiveTests() {
+  const res = await fetch(`${FIREBASE_URL}/liveTests.json`);
+  const data = await res.json();
+  LIVE_TESTS = data ? Object.values(data) : [];
+}
+
+async function loadResultsLog() {
+  const res = await fetch(`${FIREBASE_URL}/resultsLog.json`);
+  const data = await res.json();
+  RESULTS_LOG = data ? Object.values(data) : [];
+}
+
 // Builds a checkbox-style dropdown menu. onToggle(value, nowChecked) fires
 // per click; the caller decides how that affects filtering/rendering.
 function buildCheckboxMenu(menuEl, options, selectedSet, onToggle) {
@@ -54,6 +71,11 @@ function updateFilterTriggerLabel(triggerId, baseLabel, selectedSet) {
 }
 
 function buildNav() {
+  // Top-level page tabs: Home / Leaderboard / Testers
+  document.querySelectorAll(".page-tab").forEach((btn) => {
+    btn.onclick = () => setPage(btn.dataset.page);
+  });
+
   const nav = document.getElementById("nav-tabs");
   nav.innerHTML = "";
 
@@ -347,10 +369,150 @@ function renderProfile(playerName) {
   `;
 }
 
+function setPage(page) {
+  currentPage = page;
+  document.querySelectorAll(".page-tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.page === page);
+  });
+
+  const filterNav = document.getElementById("filter-nav");
+  filterNav.style.display = page === "leaderboard" ? "flex" : "none";
+
+  if (page === "home") {
+    renderHome();
+  } else if (page === "testers") {
+    renderTesters();
+  } else {
+    setView(currentView.type === "player" ? previousListView : currentView);
+  }
+
+  renderLiveNowWidget();
+}
+
+// One row of a "who tested who" list: testee head+name, gamemode icon,
+// tier badge, a divider, then the tester(s) head+name.
+function testRowHtml(testeeName, gamemode, tier, testerNames) {
+  const gm = GAMEMODES.find((g) => g.id === gamemode) || { label: gamemode, icon: null };
+  const testersHtml = (testerNames || [])
+    .map(
+      (t) => `
+        <span class="test-row-tester">
+          <img src="${headUrl(t, 20)}" alt="" class="test-row-tester-head" />
+          ${escapeHtml(t)}
+        </span>
+      `
+    )
+    .join("");
+
+  return `
+    <div class="test-row">
+      <div class="test-row-testee">
+        <img src="${headUrl(testeeName, 24)}" alt="" class="test-row-head" />
+        <span>${escapeHtml(testeeName)}</span>
+      </div>
+      <div class="test-row-gamemode">
+        ${gm.icon ? `<img src="${gm.icon}" alt="" class="test-row-gm-icon" />` : ""}
+        ${tier ? `<span class="mini-tier-label" style="color:${tierColor(tier)}">${tier}</span>` : ""}
+      </div>
+      <span class="test-row-divider">|</span>
+      <div class="test-row-testers">${testersHtml}</div>
+    </div>
+  `;
+}
+
+function renderHome() {
+  const title = document.getElementById("view-title");
+  title.textContent = "Home";
+  title.classList.remove("profile-mode");
+
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const recent = RESULTS_LOG.filter((r) => r.timestamp >= cutoff).sort(
+    (a, b) => b.timestamp - a.timestamp
+  );
+
+  const container = document.getElementById("leaderboard");
+  if (recent.length === 0) {
+    container.innerHTML = `<p class="empty-state">No tests in the last 48 hours yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="test-list">
+      ${recent
+        .map((r) => testRowHtml(r.testeeName, r.gamemode, r.tier, r.testerNames))
+        .join("")}
+    </div>
+  `;
+}
+
+// Small fixed widget in the bottom-left showing tests happening right now.
+// Shown on every page (not just Home) since it's meant to always be visible.
+function renderLiveNowWidget() {
+  const widget = document.getElementById("live-now-widget");
+  if (LIVE_TESTS.length === 0) {
+    widget.innerHTML = "";
+    widget.classList.remove("visible");
+    return;
+  }
+  widget.classList.add("visible");
+  widget.innerHTML = `
+    <div class="live-now-title">Live Now</div>
+    ${LIVE_TESTS.map((t) => testRowHtml(t.testeeName, t.gamemode, null, t.testerNames)).join("")}
+  `;
+}
+
+// Testers tab: aggregate the results log into a per-tester test count.
+function renderTesters() {
+  const title = document.getElementById("view-title");
+  title.textContent = "Testers";
+  title.classList.remove("profile-mode");
+
+  const counts = new Map(); // testerName -> count
+  RESULTS_LOG.forEach((r) => {
+    (r.testerNames || []).forEach((name) => {
+      counts.set(name, (counts.get(name) || 0) + 1);
+    });
+  });
+
+  const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  const container = document.getElementById("leaderboard");
+
+  if (sorted.length === 0) {
+    container.innerHTML = `<p class="empty-state">No completed tests logged yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table>
+      <thead>
+        <tr><th>#</th><th>Tester</th><th>Tests Done</th></tr>
+      </thead>
+      <tbody>
+        ${sorted
+          .map(
+            ([name, count], i) => `
+              <tr class="${i < 3 ? `rank-${i + 1}` : ""}">
+                <td>${i + 1}</td>
+                <td>
+                  <span class="player-link">
+                    <img src="${headUrl(name, 24)}" alt="" class="player-head" loading="lazy" />
+                    <span>${escapeHtml(name)}</span>
+                  </span>
+                </td>
+                <td>${count}</td>
+              </tr>
+            `
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
+}
+
 async function init() {
-  await loadPlayers();
+  await Promise.all([loadPlayers(), loadLiveTests(), loadResultsLog()]);
   buildNav();
-  setView({ type: "overall" });
+  setPage("home");
 }
 
 init();

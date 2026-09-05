@@ -20,7 +20,12 @@
         <span>Discord</span>
       </a>
     </div>
-    <nav>
+    <div class="page-tabs" id="page-tabs">
+      <button type="button" class="page-tab active" data-page="home">Home</button>
+      <button type="button" class="page-tab" data-page="leaderboard">Leaderboard</button>
+      <button type="button" class="page-tab" data-page="testers">Testers</button>
+    </div>
+    <nav id="filter-nav">
       <div id="nav-tabs"></div>
       <div class="custom-select" id="region-dropdown">
         <button type="button" class="custom-select-trigger" id="region-trigger">
@@ -48,6 +53,8 @@
     <h2 id="view-title">Overall Rankings</h2>
     <div id="leaderboard"></div>
   </main>
+
+  <div id="live-now-widget" class="live-now-widget"></div>
 
   <script src="js/tiers.js"></script>
   <script src="js/render.js"></script>
