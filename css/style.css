@@ -800,6 +800,7 @@ td:last-child {
 /* ---------- live now widget (fixed, bottom-left) ---------- */
 
 .side-panel-tab {
+  display: none;
   position: fixed;
   top: 50%;
   left: 0;
@@ -833,48 +834,26 @@ td:last-child {
 
 .side-panel {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 320px;
+  bottom: 16px;
+  left: 16px;
+  top: auto;
+  height: auto;
+  width: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 56px 16px 16px;
-  background: rgba(10, 13, 18, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid var(--line);
-  box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
+  padding: 0;
+  background: none;
+  border-right: none;
+  box-shadow: none;
   z-index: 200;
-  overflow-y: auto;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
-
-.side-panel.open {
-  transform: translateX(0);
+  overflow: visible;
+  max-height: calc(100vh - 32px);
+  transform: none;
 }
 
 .side-panel-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--line);
-  color: var(--text-dim);
-  font-size: 1.2rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.side-panel-close:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  display: none;
 }
 
 .live-now-widget {
@@ -1030,9 +1009,52 @@ td:last-child {
 }
 
 @media (max-width: 680px) {
+  .side-panel-tab {
+    display: block;
+  }
+
+  .side-panel-close {
+    display: block;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .side-panel-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+  }
+
   .side-panel {
+    top: 0;
+    left: 0;
+    bottom: auto;
+    height: 100vh;
     width: 100%;
-    padding-top: 56px;
+    padding: 56px 16px 16px;
+    background: rgba(10, 13, 18, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right: 1px solid var(--line);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
+    max-height: none;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .side-panel.open {
+    transform: translateX(0);
   }
 
   .live-now-widget {
