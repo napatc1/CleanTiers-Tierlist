@@ -602,9 +602,25 @@ function renderTesters() {
   }
 }
 
+function setupSidePanel() {
+  const panel = document.getElementById("side-panel");
+  const tab = document.getElementById("side-panel-tab");
+  const closeBtn = document.getElementById("side-panel-close");
+
+  tab.onclick = () => {
+    panel.classList.add("open");
+    tab.classList.add("hidden");
+  };
+  closeBtn.onclick = () => {
+    panel.classList.remove("open");
+    tab.classList.remove("hidden");
+  };
+}
+
 async function init() {
   await Promise.all([loadPlayers(), loadLiveTests(), loadResultsLog()]);
   buildNav();
+  setupSidePanel();
   setPage("home");
 }
 
