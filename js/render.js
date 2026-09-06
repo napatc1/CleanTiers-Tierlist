@@ -485,19 +485,23 @@ function liveNowRowHtml(entry) {
 
 function renderLiveNowWidget() {
   const widget = document.getElementById("live-now-widget");
-  if (currentPage !== "home" || LIVE_TESTS.length === 0) {
+  if (currentPage !== "home") {
     widget.innerHTML = "";
     widget.classList.remove("visible");
     return;
   }
   widget.classList.add("visible");
+  const rowsHtml =
+    LIVE_TESTS.length === 0
+      ? `<p class="empty-state widget-empty-state">No one's currently testing.</p>`
+      : LIVE_TESTS.map(liveNowRowHtml).join("");
   widget.innerHTML = `
     <div class="live-now-header">
       <span class="live-now-title">Active Tickets</span>
       <span class="live-now-count">${LIVE_TESTS.length}</span>
     </div>
     <div class="live-now-rows">
-      ${LIVE_TESTS.map(liveNowRowHtml).join("")}
+      ${rowsHtml}
     </div>
   `;
 }
@@ -516,20 +520,19 @@ function renderRecentTestsWidget() {
     (a, b) => b.timestamp - a.timestamp
   );
 
-  if (recent.length === 0) {
-    widget.innerHTML = "";
-    widget.classList.remove("visible");
-    return;
-  }
-
   widget.classList.add("visible");
+  const rowsHtml =
+    recent.length === 0
+      ? `<p class="empty-state widget-empty-state">No tests in the last 48 hours.</p>`
+      : recent.map(liveNowRowHtml).join("");
+
   widget.innerHTML = `
     <div class="live-now-header">
       <span class="live-now-title recent-tests-title">Recent Tests</span>
       <span class="live-now-count recent-tests-badge">48H</span>
     </div>
     <div class="live-now-rows">
-      ${recent.map(liveNowRowHtml).join("")}
+      ${rowsHtml}
     </div>
   `;
 }

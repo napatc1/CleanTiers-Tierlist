@@ -595,6 +595,11 @@ td:last-child {
   font-size: 0.9rem;
 }
 
+.widget-empty-state {
+  padding: 16px 8px;
+  font-size: 0.8rem;
+}
+
 /* ---------- mobile ---------- */
 
 @media (max-width: 680px) {
